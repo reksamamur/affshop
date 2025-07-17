@@ -2,27 +2,24 @@
  * product controller
  */
 
-import { factories } from '@strapi/strapi';
+import { Core, factories } from '@strapi/strapi';
 
 export default factories.createCoreController(
   'api::product.product',
-  ({ strapi }) => ({
+  ({ strapi }: { strapi: Core.Strapi }) => ({
     async findOne(ctx) {
-      const { slug } = ctx.params;
+      const { id } = ctx.params;
 
-      const query = {
-        filters: { slug },
-        ...ctx.query,
-      };
+      const sanitizedQueryParams = await this.sanitizeQuery(ctx);
 
-      const product = await strapi.entityService.findMany(
-        'api::product.product',
-        query
-      );
+      const product = await strapi.documents('api::product.product').findMany({
+        ...sanitizedQueryParams,
+        filters: { slug: id },
+      });
 
-      const sanitizedEntity = await this.sanitizeOutput(product, ctx);
+      const sanitizedEntity = await this.sanitizeOutput(product[0], ctx);
 
-      return this.transformResponse(sanitizedEntity[0]);
+      return this.transformResponse(sanitizedEntity);
     },
   })
 );
