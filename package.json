@@ -1,0 +1,19 @@
+{
+  "name": "astro",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && find dist -name '*.map' -delete",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@fontsource/imbue": "^5.2.6",
+    "@fontsource/twinkle-star": "^5.2.6",
+    "@strapi/client": "^1.4.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "astro": "^5.10.2",
+    "tailwindcss": "^4.1.11"
+  }
+}

@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/base.astro';
+import type { SingleProduct } from '../types/product';
+import { strapiClient, strapiImage } from '../utils/strapi';
+
+export async function getStaticPaths() {
+  const products = strapiClient.collection('products');
+
+  const allProducts = await products.find({
+    fields: ['slug'],
+    pagination: {
+      pageSize: 9999,
+    },
+  });
+
+  return allProducts.data.map((item) => ({
+    params: { slug: item.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const res = await strapiClient.fetch(`products/${slug}?populate=*`, {
+  method: 'GET',
+});
+const product = (await res.json()) as SingleProduct;
+
+const files = await strapiClient.files.findOne(product.data.thumbnail.id);
+
+console.log({
+  product: product.meta,
+  files,
+  demap: product.data.images.map((item) => ({ image: strapiImage(item.url) })),
+});
+---
+
+<BaseLayout>
+  <section class='w-full container mx-auto px-4'>
+    <pre>{JSON.stringify(product.data)}</pre>
+  </section>
+</BaseLayout>
