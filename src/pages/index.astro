@@ -1,96 +1,105 @@
 ---
-import BaseLayout from "../layouts/base.astro";
-import { Image } from "astro:assets";
-import { type Products } from "../types/product";
-import { strapiClient } from "../utils/strapi";
+import BaseLayout from '../layouts/base.astro';
+import { Image } from 'astro:assets';
+import { type Products } from '../types/product';
+import { strapiClient } from '../utils/strapi';
 
-const page = Number(Astro.url.searchParams.get("page") || 1);
-const products = strapiClient.collection("products");
+const page = Number(Astro.url.searchParams.get('page') || 1);
+const products = strapiClient.collection('products');
 const allProducts = (await products.find({
-    populate: "*",
-    pagination: {
-        page: page,
-        pageSize: 25,
-    },
+  populate: '*',
+  pagination: {
+    page: page,
+    pageSize: 25,
+  },
 })) as Products;
 
 const BASEURL = import.meta.env.PUBLIC_BASEURL;
+const SITEURL = import.meta.env.PUBLIC_SITEURL;
+
+// Canonical URL for the homepage (including pagination if applicable)
+const canonicalUrl = `${SITEURL}${Astro.url.pathname}${Astro.url.search}`;
+// No specific image for the homepage Open Graph, so imageUrl can be omitted or a general site logo
+const homePageImageUrl = `https://www.yourstore.com/images/your-site-logo.jpg`; // Consider adding a site-wide logo here
+
+const homePageTitle = 'Nazri Store';
+const homePageDescription =
+  "Explore our extensive collection of baby clothes, kids' fashion, and teen apparel. Find stylish dresses, comfortable activewear, and unique accessories. Plus, browse our selection of practical handy tools for everyday needs. Your one-stop shop for family style and convenience.";
 ---
 
-<BaseLayout>
-    <section class="w-full mx-auto container px-4">
-        <div class="py-20 space-y-8">
-            <h1 class="text-8xl font-light font-imbue">Nazri Store</h1>
-            <p class="w-md">
-                Discover the best handpicked stuff, curated by pro for top
-                buyer.
-            </p>
-        </div>
+<BaseLayout
+  title={homePageTitle}
+  description={homePageDescription}
+  canonicalUrl={canonicalUrl}
+  imageUrl={homePageImageUrl}
+  ogType='website'
+>
+  <section class='w-full mx-auto container px-4'>
+    <div class='py-20 space-y-8'>
+      <h1 class='text-8xl font-light font-imbue'>{homePageTitle}</h1>
+      <p class='w-full md:w-2xl'>
+        {homePageDescription}
+      </p>
+    </div>
 
-        <div class="w-full">
-            <!-- TODO Search component product -->
-            <!-- TODO Product -->
-            <section
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 auto-cols-fr w-full"
-            >
-                {
-                    allProducts.data.map((item) => (
-                        <div>
-                            <a
-                                href={item.slug}
-                                class="w-full flex flex-col gap-6"
-                            >
-                                <div>
-                                    <div class="border border-zinc-200 rounded-lg">
-                                        <Image
-                                            class="w-full hover:scale-105 rounded-lg transition-transform duration-200 h-96 aspect-square object-cover"
-                                            src={`${BASEURL}${item.thumbnail.url}`}
-                                            alt="A bird."
-                                            width="100"
-                                            height="100"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col gap-0.5">
-                                    <span class="text-xs font-medium uppercase mb-3">
-                                        {item.category.name}
-                                    </span>
-                                    <h2 class="text-lg font-medium">
-                                        {item.Name}
-                                    </h2>
-                                    <h3 class="text-xl">{item.Price}</h3>
-                                </div>
-                            </a>
-                        </div>
-                    ))
-                }
-            </section>
-        </div>
-    </section>
-
-    <nav style="margin-top: 2rem; text-align: center;">
+    <div class='w-full'>
+      <section
+        class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-cols-fr w-full'
+      >
         {
-            allProducts.meta.pagination.page > 1 && (
-                <a href={`/?page=${allProducts.meta.pagination.page - 1}`}>
-                    &laquo; Prev
-                </a>
-            )
+          allProducts.data.map((item) => (
+            <div>
+              <a href={`/${item.slug}`} class='w-full flex flex-col gap-6'>
+                <div>
+                  <div class='border border-zinc-200 rounded-lg'>
+                    <Image
+                      class='w-full hover:scale-105 rounded-lg transition-transform duration-200 h-60 md:h-96 aspect-square object-cover'
+                      src={`${BASEURL}${item.thumbnail.url}`}
+                      alt={item.Name}
+                      width={400}
+                      height={400}
+                    />
+                  </div>
+                </div>
+                <div class='flex flex-col gap-1'>
+                  {item.category ? (
+                    <span class='text-xs font-medium uppercase mb-3'>
+                      {item.category.name}
+                    </span>
+                  ) : null}
+                  <h2 class='text-lg font-medium mb-4'>{item.Name}</h2>
+                  <h3 class='text-xl font-medium'>{item.price}</h3>
+                </div>
+              </a>
+            </div>
+          ))
         }
+      </section>
+    </div>
+  </section>
 
-        <span style="margin: 0 1rem;">
-            Page {allProducts.meta.pagination.page} of {
-                allProducts.meta.pagination.pageCount
-            }
-        </span>
+  <nav style='margin-top: 2rem; text-align: center;'>
+    {
+      allProducts.meta.pagination.page > 1 && (
+        <a href={`/?page=${allProducts.meta.pagination.page - 1}`}>
+          &laquo; Prev
+        </a>
+      )
+    }
 
-        {
-            allProducts.meta.pagination.page <
-                allProducts.meta.pagination.pageCount && (
-                <a href={`/?page=${allProducts.meta.pagination.page + 1}`}>
-                    Next &raquo;
-                </a>
-            )
-        }
-    </nav>
+    <span style='margin: 0 1rem;'>
+      Page {allProducts.meta.pagination.page} of {
+        allProducts.meta.pagination.pageCount
+      }
+    </span>
+
+    {
+      allProducts.meta.pagination.page <
+        allProducts.meta.pagination.pageCount && (
+        <a href={`/?page=${allProducts.meta.pagination.page + 1}`}>
+          Next &raquo;
+        </a>
+      )
+    }
+  </nav>
 </BaseLayout>

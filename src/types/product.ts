@@ -30,7 +30,7 @@ export interface Product {
   updatedAt: string;
   publishedAt: string;
   locale: string;
-  Price: string;
+  price: string;
   images: Image[];
   thumbnail: Image;
   SEO: SEO;

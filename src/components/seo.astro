@@ -1,0 +1,55 @@
+---
+// src/components/Seo.astro
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  imageUrl?: string; // Optional for pages without a main image (like homepage)
+  ogType?: string; // e.g., 'website', 'product'
+  price?: string; // For product pages
+  currency?: string; // For product pages
+  twitterSite?: string; // Your Twitter handle
+  twitterCreator?: string; // Creator's Twitter handle (optional)
+}
+
+const {
+  title,
+  description,
+  canonicalUrl,
+  imageUrl,
+  ogType = 'website', // Default to 'website'
+  price,
+  currency = 'RM', // Default currency
+  twitterSite, // Replace with your actual Twitter handle
+  twitterCreator,
+} = Astro.props;
+---
+
+<title>{title}</title>
+<meta name='description' content={description} />
+<meta name='robots' content='index, follow' />
+
+<link rel='canonical' href={canonicalUrl} />
+
+<meta property='og:title' content={title} />
+<meta property='og:description' content={description} />
+<meta property='og:url' content={canonicalUrl} />
+<meta property='og:type' content={ogType} />
+{imageUrl && <meta property='og:image' content={imageUrl} />}
+{
+  ogType === 'product' && price && (
+    <>
+      <meta property='og:price:amount' content={price} />
+    </>
+  )
+}
+
+<meta
+  name='twitter:card'
+  content={imageUrl ? 'summary_large_image' : 'summary'}
+/>
+<meta name='twitter:site' content={twitterSite} />
+{twitterCreator && <meta name='twitter:creator' content={twitterCreator} />}
+<meta name='twitter:title' content={title} />
+<meta name='twitter:description' content={description} />
+{imageUrl && <meta name='twitter:image' content={imageUrl} />}

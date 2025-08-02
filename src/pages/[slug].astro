@@ -1,22 +1,13 @@
 ---
+// src/pages/products/[slug].astro
 import BaseLayout from '../layouts/base.astro';
 import type { SingleProduct } from '../types/product';
-import { strapiClient, strapiImage } from '../utils/strapi';
+import { strapiClient } from '../utils/strapi';
+import { Image } from 'astro:assets';
 
-export async function getStaticPaths() {
-  const products = strapiClient.collection('products');
+const BASEURL = import.meta.env.PUBLIC_BASEURL;
 
-  const allProducts = await products.find({
-    fields: ['slug'],
-    pagination: {
-      pageSize: 9999,
-    },
-  });
-
-  return allProducts.data.map((item) => ({
-    params: { slug: item.slug },
-  }));
-}
+export const prerender = false;
 
 const { slug } = Astro.params;
 
@@ -25,17 +16,124 @@ const res = await strapiClient.fetch(`products/${slug}?populate=*`, {
 });
 const product = (await res.json()) as SingleProduct;
 
-const files = await strapiClient.files.findOne(product.data.thumbnail.id);
+const fullImageUrl = `${BASEURL}${product.data.thumbnail.url}`;
+const canonicalUrl = Astro.url.href;
 
-console.log({
-  product: product.meta,
-  files,
-  demap: product.data.images.map((item) => ({ image: strapiImage(item.url) })),
-});
+const seoTitle =
+  product.data.SEO?.metaTitle || `${product.data.Name} | Nazri Store`;
+const seoDescription =
+  product.data.SEO?.metaDescription || product.data.descriptions;
+
+const allImageUrls = [
+  { url: fullImageUrl, alt: product.data.Name }, // Main thumbnail first
+  ...(product.data.images || []).map((img) => ({
+    url: `${BASEURL}${img.url}`,
+    alt: `${product.data.Name} additional image`,
+  })),
+];
 ---
 
-<BaseLayout>
-  <section class='w-full container mx-auto px-4'>
-    <pre>{JSON.stringify(product.data)}</pre>
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  canonicalUrl={canonicalUrl}
+  imageUrl={fullImageUrl}
+  ogType='product'
+  price={product.data.price}
+>
+  <section class='w-full mx-auto max-w-7xl container px-4 py-10 space-y-12'>
+    <nav class='flex' aria-label='Breadcrumb'>
+      <ol class='inline-flex gap-2 items-center'>
+        <li class='inline-flex items-center'>
+          <a href='/' class='inline-flex items-center text-xs'> Home </a>
+        </li>
+        <li class='text-sm'>/</li>
+        <li aria-current='page'>
+          <span class='text-xs'>
+            {product.data.Name}
+          </span>
+        </li>
+      </ol>
+    </nav>
+
+    <div class='grid grid-cols-1 lg:grid-cols-3 gap-10'>
+      <div class='lg:col-span-1'>
+        <div class='border p-1 rounded-xl border-zinc-200'>
+          <Image
+            id='mainProductImage'
+            class='w-full h-fit aspect-square object-contain'
+            src={fullImageUrl}
+            alt={product.data.Name}
+            width={700}
+            height={700}
+          />
+        </div>
+        <div class='w-full flex overflow-x-auto gap-2 mt-4 pb-2 scrollbar-hide'>
+          {
+            allImageUrls.map((img, index) => (
+              <button
+                type='button'
+                class='flex-shrink-0 border p-1 rounded-xl border-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 thumbnail-button'
+                data-image-url={img.url}
+                data-image-alt={img.alt}
+              >
+                <Image
+                  class='w-20 h-20 object-contain'
+                  src={img.url}
+                  alt={img.alt}
+                  width={100}
+                  height={100}
+                />
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <div class='lg:col-span-2 py-6 space-y-10'>
+        <div class='space-y-4'>
+          <h1 class='text-2xl font-medium'>{product.data.Name}</h1>
+          <h2 class='text-3xl font-semibold'>
+            {product.data.price}
+          </h2>
+        </div>
+
+        <div class='w-full'>
+          <a
+            href={product.data.link}
+            class='rounded-md border w-full md:w-fit border-zinc-200 px-10 py-3 bg-zinc-800 text-white text-lg cursor-pointer'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Buy Now
+          </a>
+        </div>
+
+        <p>{product.data.descriptions}</p>
+      </div>
+    </div>
   </section>
 </BaseLayout>
+
+<script is:inline>
+  // Get the main image element
+  const mainImage = document.getElementById('mainProductImage');
+  // Get all thumbnail buttons
+  const thumbnailButtons = document.querySelectorAll('.thumbnail-button');
+
+  if (mainImage && thumbnailButtons.length > 0) {
+    thumbnailButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const imageUrl = button.dataset.imageUrl;
+        const imageAlt = button.dataset.imageAlt;
+
+        if (imageUrl) {
+          mainImage.src = imageUrl;
+          mainImage.alt = imageAlt;
+          // You might also want to update the width/height if images vary greatly
+          // mainImage.width = parseInt(button.dataset.imageWidth);
+          // mainImage.height = parseInt(button.dataset.imageHeight);
+        }
+      });
+    });
+  }
+</script>

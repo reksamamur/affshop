@@ -1,37 +1,53 @@
 ---
-import "@fontsource/imbue";
-import "../styles/global.css";
-import Header from "../components/navigation.astro";
+// src/layouts/base.astro
+import '@fontsource/imbue';
+import '../styles/global.css';
+import Header from '../components/navigation.astro';
+import Seo from '../components/seo.astro'; // Import your new SEO component
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl: string; // Add canonicalUrl to base layout props
+  imageUrl?: string; // Add imageUrl to base layout props
+  ogType?: string; // Add ogType to base layout props
+  price?: string; // Add price to base layout props
+  currency?: string; // Add currency to base layout props
+}
+
+const { title, description, canonicalUrl, imageUrl, ogType, price, currency } =
+  Astro.props;
 ---
 
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!-- TODO meta tag here -->
-    </head>
-    <body class="w-full">
-        <Header />
-        <main class="min-h-screen">
-            <slot />
-        </main>
-        <footer class="px-4 py-18 border-t border-t-zinc-100 bg-zinc-50">
-            <div class="space-y-6 mx-auto container">
-                <h6 class="text-sm font-light">Nazri Store</h6>
-                <p class="text-xs text-zinc-400">
-                    <span>
-                        Tennis Supply is a directory of selected tennis things.
-                    </span>
-                    <br />
-                    <span>
-                        Explore a curated selection of places, routes, stores,
-                        and gear.
-                    </span>
-                </p>
-                <p class="text-xs font-medium text-zinc-800">
-                    Copyright © 2025
-                </p>
-            </div>
-        </footer>
-    </body>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <meta name='robots' content='index, follow' />
+    <Seo
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      imageUrl={imageUrl}
+      ogType={ogType}
+      price={price}
+      currency={currency}
+    />
+  </head>
+
+  <body class='w-full'>
+    <Header />
+    <main class='min-h-screen'>
+      <slot />
+    </main>
+    <footer class='px-4 py-18 border-t border-t-zinc-100 bg-zinc-50'>
+      <div class='space-y-6 mx-auto container'>
+        <h6 class='text-sm font-light'>Nazri Store</h6>
+        <p class='text-xs text-zinc-400'>
+          {description}
+        </p>
+        <p class='text-xs font-medium text-zinc-800'>Copyright © 2025</p>
+      </div>
+    </footer>
+  </body>
 </html>
