@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://store.reksaperson.my.id/sitemap-index.xml
+Sitemap: https://strapi.reksaperson.my.id/api/sitemap/index.xml
