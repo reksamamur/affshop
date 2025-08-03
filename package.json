@@ -9,7 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.2",
+    "@astrojs/node": "^9.3.3",
     "@fontsource/imbue": "^5.2.6",
     "@fontsource/twinkle-star": "^5.2.6",
     "@strapi/client": "^1.4.0",
