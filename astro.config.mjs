@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 import node from "@astrojs/node";
 
+import sitemap from "@astrojs/sitemap";
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -15,4 +17,7 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+
+  site: 'https://store.reksaperson.my.id',
+  integrations: [sitemap()],
 });

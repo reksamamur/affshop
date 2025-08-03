@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^9.3.3",
+    "@astrojs/sitemap": "^3.4.2",
     "@fontsource/imbue": "^5.2.6",
     "@fontsource/twinkle-star": "^5.2.6",
     "@strapi/client": "^1.4.0",
@@ -18,7 +19,7 @@
     "tailwindcss": "^4.1.11"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-musl": "4.46.2",
-    "@rollup/rollup-linux-arm64-gnu": "4.46.2"
+    "@rollup/rollup-linux-arm64-gnu": "4.46.2",
+    "@rollup/rollup-linux-x64-musl": "4.46.2"
   }
 }
