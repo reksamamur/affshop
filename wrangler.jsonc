@@ -11,5 +11,11 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "routes": [
+    {
+      "pattern": "store.reksaperson.my.id",
+      "custom_domain": true
+    }
+  ]
 }
