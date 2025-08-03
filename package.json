@@ -17,7 +17,8 @@
     "astro": "^5.10.2",
     "tailwindcss": "^4.1.11"
   },
-  "devDependencies": {
-    "wrangler": "^4.25.0"
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-musl": "4.46.2",
+    "@rollup/rollup-linux-arm64-gnu": "4.46.2"
   }
 }
