@@ -1,0 +1,10 @@
+services:
+  affshop-store:
+    build:
+      context: . 
+      dockerfile: Dockerfile # Specify the Dockerfile name
+    image: affshop-store:latest # Name the built image
+    container_name: affshop-store-container 
+    ports:
+      - '4321:4321'
+    restart: unless-stopped 
